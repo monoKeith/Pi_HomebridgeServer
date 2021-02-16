@@ -1,0 +1,80 @@
+import RPi.GPIO as GPIO
+import time
+from flask import Flask
+
+
+# Define button pins
+PIN_Black = 17
+PIN_Grey  = 27
+PIN_White = 22
+# Define repay pin
+PIN_Relay = 23
+# Button Debounce = 200ms
+PIN_Bouncetime = 200
+
+# Global vars
+relay_on = False
+
+
+def relay_update():
+    global relay_on
+    GPIO.output(PIN_Relay, relay_on)
+
+
+def handle_press(channel):
+    if (channel == PIN_Black):
+        print("Black.")
+    elif (channel == PIN_Grey):
+        print("Grey.")
+        off()
+    elif (channel == PIN_White):
+        print("White.")
+        on()
+
+
+def setupPins():
+    # Init button pins
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(PIN_Black, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    GPIO.setup(PIN_Grey,  GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    GPIO.setup(PIN_White, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+    # Init relay pin
+    GPIO.setup(PIN_Relay, GPIO.OUT)
+    # Register event handler
+    GPIO.add_event_detect(PIN_Black, GPIO.RISING, callback=handle_press, bouncetime=PIN_Bouncetime)
+    GPIO.add_event_detect(PIN_Grey,  GPIO.RISING, callback=handle_press, bouncetime=PIN_Bouncetime)
+    GPIO.add_event_detect(PIN_White, GPIO.RISING, callback=handle_press, bouncetime=PIN_Bouncetime)
+    
+
+# Run
+setupPins()
+app = Flask(__name__)
+
+
+"""Flask HTTP Handlers"""
+# Turn on
+@app.route("/on")
+def on():
+	global relay_on
+	relay_on = True
+	relay_update()
+	return "on"
+
+# Turn off
+@app.route("/off")
+def off():
+	global relay_on
+	relay_on = False
+	relay_update()
+	return "off"
+
+# Check status, returns str(1) or str(0)
+@app.route("/status")
+def status():
+	global relay_on
+	return str(1 if relay_on else 0)
+
+
+# run app on port 5001
+if __name__ == '__main__':
+    app.run(host="localhost", port=5001, debug=False)
