@@ -24,8 +24,8 @@ try:
 
     while(True):
         # Main loop
-        UI_CTL.show_time()
-        time.sleep(10)
+        UI_CTL.refresh()
+        time.sleep(0.2)
 
 
 finally:

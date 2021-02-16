@@ -48,7 +48,7 @@ class IO_class:
 
     def relay_update(self):
         GPIO.output(self.PIN_Relay, self.relay_on)
-        self.UI_CTL.check()
+        self.UI_CTL.request_tmp_msg()
 
 
     def handle_press(self, channel):
