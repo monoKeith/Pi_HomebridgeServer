@@ -1,4 +1,5 @@
 import RPi.GPIO as GPIO
+import time
 
 # IO class, controls relay and buttons
 class IO_class:
@@ -12,21 +13,32 @@ class IO_class:
     def off(self):
         self.relay_on = False
         self.relay_update()
+
+
+    def dim_screen(self):
+        self.UI_CTL.clear_screen()
         
 
     def relay_update(self):
         GPIO.output(self.PIN_Relay, self.relay_on)
+        self.UI_CTL.check()
 
 
     def handle_press(self, channel):
-        if   (channel == self.PIN_Black):
-            print("Black.")
-        elif (channel == self.PIN_Grey):
-            print("Grey.")
-            self.off()
-        elif (channel == self.PIN_White):
-            print("White.")
-            self.on()
+        if(not self.thread_lock):
+            self.thread_lock = True
+            if   (channel == self.PIN_Black):
+                # print("Black.")
+                self.dim_screen()
+            elif (channel == self.PIN_Grey):
+                # print("Grey.")
+                self.off()
+            elif (channel == self.PIN_White):
+                # print("White.")
+                self.on()
+            # debounce
+            time.sleep(self.PIN_Bouncetime / 100)
+            self.thread_lock = False
 
 
     def __init__(self):
@@ -51,3 +63,6 @@ class IO_class:
         GPIO.add_event_detect(self.PIN_Black, GPIO.RISING, callback=self.handle_press, bouncetime=self.PIN_Bouncetime)
         GPIO.add_event_detect(self.PIN_Grey,  GPIO.RISING, callback=self.handle_press, bouncetime=self.PIN_Bouncetime)
         GPIO.add_event_detect(self.PIN_White, GPIO.RISING, callback=self.handle_press, bouncetime=self.PIN_Bouncetime)
+        # Class vars
+        self.thread_lock = False
+        self.UI_CTL = None

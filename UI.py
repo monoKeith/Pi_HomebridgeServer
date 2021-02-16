@@ -25,12 +25,20 @@ class UI_class:
         self.DISPLAY.clear()
         self.DISPLAY.display()
 
-    
+
     def print_text(self, text):
         image = Image.new('1', (self.WIDTH, self.HEIGHT))
         draw = ImageDraw.Draw(image)
-        draw.text((10,0), text, font=self.FONT, fill=256)
+        draw.text((10,10), text, font=self.FONT, fill=256)
         self.update(image)
+
+
+    def check(self):
+        self.clear_screen()
+        if(self.IO_CTL.relay_on):
+            self.print_text("iKEA  ON")
+        else:
+            self.print_text("iKEA OFF")
 
 
     def __init__(self):
@@ -44,4 +52,6 @@ class UI_class:
         self.FONT    = ImageFont.truetype("Fonts/PTMono.ttc", 23)
         self.FONT_TC = ImageFont.truetype("Fonts/PingFang.ttc", 55)
         self.EMOJI   = ImageFont.truetype("Fonts/AppleEmoji.ttc", 48)
+        # variables
+        self.IO_CTL = None
 
