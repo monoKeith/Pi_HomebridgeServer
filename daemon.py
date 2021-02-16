@@ -1,4 +1,5 @@
 import time
+import threading
 import IO
 import UI
 import switchServer as SW_SERVER
@@ -13,12 +14,19 @@ try:
     SW_SERVER.IO_CTL = IO_CTL
     UI_CTL.IO_CTL = IO_CTL
 
+    # Run sw server in new thread
+    sw_server_thread = threading.Thread(target = SW_SERVER.run)
+    sw_server_thread.start()
 
-    # Splash screen
-    UI_CTL.splash()
 
-    # Run flask server, block until quit.
-    SW_SERVER.app.run(host="localhost", port=5001, debug=False)
+    # Display spash screen delay
+    time.sleep(5)
+
+    while(True):
+        # Main loop
+        UI_CTL.show_time()
+        time.sleep(10)
+
 
 finally:
     UI_CTL.clear_screen()

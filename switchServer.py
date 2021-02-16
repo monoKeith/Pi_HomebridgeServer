@@ -25,3 +25,8 @@ def off():
 def status():
     global IO_CTL
     return str(1 if IO_CTL.relay_on else 0)
+
+
+def run():
+    global app
+    app.run(host="localhost", port=5001, debug=False)
